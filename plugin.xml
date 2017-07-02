@@ -32,6 +32,13 @@
         <engine name="cordova-ios" version=">=4.1.0" />
     </engines>
 
+	<!-- android preserve file:// -->
+	<platform name="android">
+	<config-file target="res/xml/config.xml" parent="/*">
+			<content src="index.html" />
+        </config-file>
+	</platform>
+	
     <!-- ios -->
     <platform name="ios">
 
@@ -43,7 +50,6 @@
             <preference name="CordovaLocalWebServerStartOnSimulator" value="true" />
 			<access origin="http://localhost" />
       <allow-navigation href="http://localhost:*/*" />
-		<content src="http://localhost:12344" />
         </config-file>
 		
         
