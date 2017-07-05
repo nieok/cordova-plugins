@@ -214,40 +214,40 @@
         return [[GCDWebServerRequest alloc] initWithMethod:requestMethod url:requestURL headers:requestHeaders path:urlPath query:urlQuery];
     };
 
-    //GCDWebServerAsyncProcessBlock asyncProcessBlock = ^void (GCDWebServerRequest* request, GCDWebServerCompletionBlock complete) {
+    GCDWebServerAsyncProcessBlock asyncProcessBlock = ^void (GCDWebServerRequest* request, GCDWebServerCompletionBlock complete) {
 
         //check if it is a request from localhost
-       // NSString *host = [request.headers objectForKey:@"Host"];
-       // if (host==nil || [host hasPrefix:@"localhost"] == NO ) {
-       //     complete([GCDWebServerErrorResponse responseWithClientError:kGCDWebServerHTTPStatusCode_Forbidden message:@"FORBIDDEN"]);
-        //    return;
-       // }
+        NSString *host = [request.headers objectForKey:@"Host"];
+        if (host==nil || [host hasPrefix:@"localhost"] == NO ) {
+            complete([GCDWebServerErrorResponse responseWithClientError:kGCDWebServerHTTPStatusCode_Forbidden message:@"FORBIDDEN"]);
+            return;
+        }
 
         //check if the querystring or the cookie has the token
-        //BOOL hasToken = (request.URL.query && [request.URL.query containsString:authToken]);
-        //NSString *cookie = [request.headers objectForKey:@"Cookie"];
-        //BOOL hasCookie = (cookie && [cookie containsString:authToken]);
+        BOOL hasToken = (request.URL.query && [request.URL.query containsString:authToken]);
+        NSString *cookie = [request.headers objectForKey:@"Cookie"];
+        BOOL hasCookie = (cookie && [cookie containsString:authToken]);
         //if (!hasToken && !hasCookie) {
-        //    complete([GCDWebServerErrorResponse responseWithClientError:kGCDWebServerHTTPStatusCode_Forbidden message:@"FORBIDDEN"]);
-            //return;
+         //   complete([GCDWebServerErrorResponse responseWithClientError:kGCDWebServerHTTPStatusCode_Forbidden message:@"FORBIDDEN"]);
+          //  return;
         //}
 
-        //processRequestForResponseBlock(request, ^void(GCDWebServerResponse* response){
-          //  if (response) {
-          //      response.cacheControlMaxAge = cacheAge;
-         //   } else {
-         //       response = [GCDWebServerResponse responseWithStatusCode:kGCDWebServerHTTPStatusCode_NotFound];
-          //  }
+        processRequestForResponseBlock(request, ^void(GCDWebServerResponse* response){
+            if (response) {
+                response.cacheControlMaxAge = cacheAge;
+            } else {
+                response = [GCDWebServerResponse responseWithStatusCode:kGCDWebServerHTTPStatusCode_NotFound];
+            }
 
-            //if (hasToken && !hasCookie) {
+            
                 //set cookie
-                //[response setValue:[NSString stringWithFormat:@"%@;path=/", authToken] forAdditionalHeader:@"Set-Cookie"];
-            //}
-         //   complete(response);
-      //  });
-   // };
+                [response setValue:[NSString stringWithFormat:@"%@;path=/", authToken] forAdditionalHeader:@"Set-Cookie"];
+            
+            complete(response);
+        });
+    };
 
-[self.server addHandlerWithMatchBlock:matchBlock asyncProcessBlock:asyncProcessBlock];
+    [self.server addHandlerWithMatchBlock:matchBlock asyncProcessBlock:asyncProcessBlock];
 }
 
 - (void) addAppFileSystemHandler:(NSString*)authToken basePath:(NSString*)basePath indexPage:(NSString*)indexPage
